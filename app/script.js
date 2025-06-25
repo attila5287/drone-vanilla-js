@@ -178,7 +178,6 @@ export { testpoly, geometricRoute };
 const $info = document.querySelector("#info");
 const $area = document.querySelector("#calculated-area");
 const $distance = document.querySelector("#calculated-distance");
-const $showPanelGeo = document.querySelector("#show-panel-geo");
 const $geoButtons = document.querySelectorAll( ".geo-btn" );
 const $geoInputs = document.querySelectorAll( ".geo-input-el" );
 
@@ -190,12 +189,6 @@ const positionMap = {
 }; // denver civics 
 // console.log(positionMap)
 
-function fetchCoordsInput() {
-  return [
-    +document.querySelector("#map-coords-lng").value,
-     +document.querySelector("#map-coords-lat").value,
-  ]
-}
   
 const userBaseHeight  = document.querySelector("#user-base-height");
 const userTopHeight  = document.querySelector("#user-top-height");
@@ -305,40 +298,19 @@ $geoInputs.forEach((inputEl) =>
     inputEl.addEventListener( "change", handlerGeo )
 );
 
-function handlerShowPanelGeo(e) {
-  // e.target is the SWITCH element
-  console.log("clk target:>> " + e.target.dataset.target);
-  console.log("clk on>> " + e.target.id + " chk stat>> " + e.target.checked);
-
-  const isChecked = e.target.checked;
-  // el is the DATA-TARGET ELEMENT that needs to be
-  const el = document.getElementById(e.target.dataset.target);
-  if (!isChecked) {
-    el.classList.remove("animate__slideInLeft");
-    el.classList.add("animate__fadeOutLeftBig");
-  } else {
-    el.classList.remove("animate__fadeOutLeftBig");
-    el.classList.add("animate__slideInLeft");
-  }
-}
-
-$showPanelGeo.addEventListener("change", handlerShowPanelGeo);
-
-
 // #region base config and public key token
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYXR0aWxhNTIiLCJhIjoiY2thOTE3N3l0MDZmczJxcjl6dzZoNDJsbiJ9.bzXjw1xzQcsIhjB_YoAuEw";
-let baseConfig = {
-  basemap: {
-    lightPreset: "dusk",
-  },
-};
 // #endregion
 // #region map construct map object
 const map = new mapboxgl.Map({
   container: "map",
   style: "mapbox://styles/mapbox/standard",
-  config: baseConfig,
+  config: {
+    basemap: {
+      lightPreset: "dusk",
+    },
+  },
   zoom: 18.93,
   bearing: 150,
   center: positionMap, // `civic`
@@ -393,111 +365,6 @@ function updateArea(e) {
   }
 }
 // #endregion
-// #region map camera control events: HANDLER DISABLE
-function handlerCamCheckBoxes(e) {
-  const handler = e.target.id;
-  // console.log('handler')
-  // console.log(handler)
-  // console.log(e.target.checked)
-  if (e.target.checked) {
-    map[handler].enable();
-  } else {
-    map[handler].disable();
-  }
-}
-
-// #endregion
-// #region Object-3d model transformation: (from documentation)
-// #endregion
-// // #region Custom layer for THREE.JS SCNE 3D:(from documentation)
-// const THREE = window.THREE;
-// const customLayer = {
-//   id: "threeJS",
-//   type: "custom",
-//   renderingMode: "3d",
-//   onAdd: function (map, gl) {
-//     this.camera = new THREE.Camera();
-//     this.scene = new THREE.Scene();
-//     // create two three.js lights to illuminate the model
-//     const directionalLight = new THREE.DirectionalLight(0xffffff);
-//     directionalLight.position.set(0, -70, 100).normalize();
-//     this.scene.add(directionalLight);
-
-//     const directionalLight2 = new THREE.DirectionalLight(0xffffff);
-//     directionalLight2.position.set(0, 70, 100).normalize();
-//     this.scene.add(directionalLight2);
-//     const directionalLight3 = new THREE.DirectionalLight(0xffffff);
-//     directionalLight3.position.set(10, 50, 0).normalize();
-//     this.scene.add(directionalLight3);
-
-//     // use the three.js GLTF loader to add the 3D model to the three.js scene
-//     // const modelGroup = new THREE.Group();
-//     const loader = new THREE.GLTFLoader();
-//     loader.load("./uav/scene.gltf", (gltf) => {
-//       this.scene.add(gltf.scene);
-//       // console.log(`this.id: ${this.id}`)
-//     });
-//     this.map = map;
-
-//     // use the Mapbox GL JS map canvas for three.js
-//     this.renderer = new THREE.WebGLRenderer({
-//       canvas: map.getCanvas(),
-//       context: gl,
-//       antialias: true,
-//     });
-
-//     this.renderer.autoClear = false;
-//   },
-
-//   // #region RENDER
-//   render: function (gl, matrix) {
-//     const rotationX = new THREE.Matrix4().makeRotationAxis(
-//       new THREE.Vector3(1, 0, 0),
-//       modelTransform.rotateX
-//     );
-//     const rotationY = new THREE.Matrix4().makeRotationAxis(
-//       new THREE.Vector3(0, 1, 0),
-//       modelTransform.rotateY
-//     );
-//     const rotationZ = new THREE.Matrix4().makeRotationAxis(
-//       new THREE.Vector3(0, 0, 1),
-//       modelTransform.rotateZ
-//     );
-
-//     const m = new THREE.Matrix4().fromArray(matrix);
-//     const l = new THREE.Matrix4()
-//       .makeTranslation(
-//         modelTransform.translateX,
-//         modelTransform.translateY,
-//         modelTransform.translateZ
-//       )
-//       .scale(
-//         new THREE.Vector3(
-//           modelTransform.scale,
-//           -modelTransform.scale,
-//           modelTransform.scale
-//         )
-//       )
-//       .multiply(rotationX)
-//       .multiply(rotationY)
-//       .multiply(rotationZ);
-//     this.camera.projectionMatrix = m.multiply(l);
-//     this.renderer.resetState();
-//     this.scene.rotation.z += (Math.random() - 0.5) * 0.005;
-//     this.scene.position.y += (Math.random() - 0.5) * 0.2;
-//     this.renderer.render(this.scene, this.camera);
-//     gl.flush();
-//     this.map.triggerRepaint();
-//     // console.log(this)
-//   },
-//   // #endregion
-// };
-// #endregion
-// #region blank geoJSON dat`a to load when there is no polygon
-const polyData = {
-  type: "FeatureCollection",
-  features: [],
-};
 const lineData = {
   type: "Feature",
   properties: {
